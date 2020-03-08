@@ -28,12 +28,38 @@ class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 		return RecipeListViewHolder(itemView)
 	}
 
+	fun getDataAt(position:Int):Recipe?
+	{
+		return this.recipes[this.sortedRecipeFilenameList[position]]
+	}
+
 	// Replace the contents of a view (invoked by the layout manager)
 	override fun onBindViewHolder(holder: RecipeListViewHolder, position: Int) {
-		val recipe:Recipe? = this.recipes[this.sortedRecipeFilenameList[position]]
+		val recipe:Recipe? = getDataAt(position)
 		if (recipe != null)
 		{
 			holder.setData(recipe)
+		}
+	}
+
+	fun setRecipes(recipes:List<Recipe>)
+	{
+		this.sortedRecipeFilenameList.clear()
+		for (recipe in recipes)
+		{
+			this.sortedRecipeFilenameList.add(recipe.getFileName())
+			this.recipes[recipe.getFileName()] = recipe
+		}
+		this.sort()
+	}
+
+	fun deleteUnlistedFiles(ctx:Context)
+	{
+		for (fileName in this.recipes.keys)
+		{
+			if (this.sortedRecipeFilenameList.contains(fileName)) continue
+			this.recipes[fileName]!!.deleteFile(ctx)
+			this.recipes.remove(fileName)
 		}
 	}
 
@@ -56,11 +82,11 @@ class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 				recipe.readFromDisk(ctx)
 			}
 		}
-		sort()
+		this.sort()
 		this.notifyDataSetChanged()
 	}
 
-	fun sort()
+	private fun sort()
 	{
 		this.sortedRecipeFilenameList.sortBy { recipeFileName -> this.recipes[recipeFileName]!!.getName() }
 	}

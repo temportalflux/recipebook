@@ -1,11 +1,10 @@
 package com.temportalflux.recipebook.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -28,7 +27,73 @@ import com.temportalflux.recipebook.utils.getUserPrefs
 // https://www.androidauthority.com/android-app-development-complete-beginners-658469/
 // https://developer.android.com/guide/topics/ui/layout/recyclerview
 // http://www.androidtutorialshub.com/android-recyclerview-tutorial/
-class MainActivity : AppCompatActivity() {
+
+interface OnItemGestureListener {
+	fun onItemPress(view: View, position: Int)
+	fun onLongItemPress(view: View, position: Int)
+}
+
+class MainActivity : AppCompatActivity(), OnItemGestureListener {
+
+	inner class GestureClickListener(
+		private val parentView: RecyclerView,
+		private val listener: OnItemGestureListener
+	) :
+		RecyclerView.OnItemTouchListener {
+
+		private val gestureDetector: GestureDetector =
+			GestureDetector(parentView.context, object : GestureDetector.OnGestureListener {
+
+				override fun onShowPress(e: MotionEvent?) {}
+
+				override fun onLongPress(e: MotionEvent?) {
+					if (e == null) {
+						return
+					}
+					val child = parentView.findChildViewUnder(e.x, e.y)
+					if (child != null) {
+						listener.onLongItemPress(
+							child,
+							parentView.getChildAdapterPosition(child)
+						)
+					}
+				}
+
+				override fun onSingleTapUp(e: MotionEvent?): Boolean = true
+
+				override fun onDown(e: MotionEvent?): Boolean = false
+
+				override fun onFling(
+					e1: MotionEvent?,
+					e2: MotionEvent?,
+					velocityX: Float,
+					velocityY: Float
+				): Boolean = false
+
+				override fun onScroll(
+					e1: MotionEvent?,
+					e2: MotionEvent?,
+					distanceX: Float,
+					distanceY: Float
+				): Boolean = false
+			})
+
+		override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+
+		override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+			val child = parentView.findChildViewUnder(e.x, e.y)
+			if (child != null && gestureDetector.onTouchEvent(e)) {
+				listener.onItemPress(
+					child,
+					parentView.getChildAdapterPosition(child)
+				)
+			}
+			return false
+		}
+
+		override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+
+	}
 
 	private lateinit var requestQueue: RequestQueue
 	private lateinit var recipeListView: RecyclerView
@@ -50,6 +115,18 @@ class MainActivity : AppCompatActivity() {
 		this.recipeListView.itemAnimator = DefaultItemAnimator()
 		this.recipeListAdapter = RecipeListAdapter()
 		this.recipeListView.adapter = this.recipeListAdapter
+		this.recipeListView.addOnItemTouchListener(GestureClickListener(this.recipeListView, this))
+	}
+
+	override fun onItemPress(view: View, position: Int) {
+		val recipe = this.recipeListAdapter.getDataAt(position)
+		if (recipe != null)
+		{
+			startActivity(Intent(this, ViewRecipeActivity::class.java).putExtra("recipe", recipe))
+		}
+	}
+
+	override fun onLongItemPress(view: View, position: Int) {
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,8 +156,6 @@ class MainActivity : AppCompatActivity() {
 	private fun refreshEntries() {
 		Log.d("Main", getGithubBranchValue(this) ?: "no branch")
 		fetchFiles()
-		this.recipeListAdapter.readNamesFromDisk(this)
-		this.recipeListAdapter.readContentsFromDisk(this)
 	}
 
 	private fun fetchFiles() {
@@ -98,6 +173,7 @@ class MainActivity : AppCompatActivity() {
 							tree {
 								entries {
 									name
+									oid
 									object {
 										... on Blob {
 											text
@@ -127,7 +203,12 @@ class MainActivity : AppCompatActivity() {
 					val recipeContent = recipeDatum
 						.getJSONObject("object")
 						.getString("text")
-					recipes.add(Recipe(recipeFileName, true).withContent(recipeContent))
+					recipes.add(
+						// these recipes are never dirty, because they always have fresh content from the remote repository
+						Recipe(recipeFileName, false)
+							.withId(recipeDatum.getString("oid"))
+							.withContent(recipeContent)
+					)
 				}
 				Log.d("Main", "Found ${recipes.size} recipes at commit $commitSha")
 				with(getUserPrefs(this).edit()) {
@@ -143,18 +224,15 @@ class MainActivity : AppCompatActivity() {
 		))
 	}
 
-	private fun onFetchedRecipes(list:List<Recipe>)
-	{
-		for (recipe in list)
-		{
-			Log.d("Main", recipe.getFileName())
-			if (!recipe.getFile(this).exists())
-			{
+	private fun onFetchedRecipes(list: List<Recipe>) {
+		for (recipe in list) {
+			if (!recipe.getFile(this).exists()) {
 				recipe.writeToDisk(this)
 			}
 		}
-		this.recipeListAdapter.readNamesFromDisk(this)
-		this.recipeListAdapter.readContentsFromDisk(this)
+		this.recipeListAdapter.setRecipes(list)
+		this.recipeListAdapter.deleteUnlistedFiles(this)
+		this.recipeListAdapter.notifyDataSetChanged()
 	}
 
 }
