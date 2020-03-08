@@ -1,4 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
+	<dimen name="label">14sp</dimen>
+	<dimen name="value">18sp</dimen>
+	<dimen name="header">24sp</dimen>
 </resources>

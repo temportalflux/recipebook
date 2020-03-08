@@ -4,6 +4,7 @@ import android.content.Context
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
+import java.io.StringReader
 import java.util.*
 
 class Recipe(private var name: String, private var bIsDirty: Boolean = false) {
@@ -18,6 +19,12 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) {
 	}
 
 	fun isDirty(): Boolean = this.bIsDirty
+
+	fun withContent(textFileContent:String):Recipe
+	{
+		deserialize(BufferedReader(StringReader(textFileContent)))
+		return this
+	}
 
 	fun getFileName(): String {
 		return this.name.trim()

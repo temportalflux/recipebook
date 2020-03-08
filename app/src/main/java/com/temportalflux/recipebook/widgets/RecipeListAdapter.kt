@@ -14,7 +14,7 @@ class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 	private var sortedRecipeFilenameList:MutableList<String> = mutableListOf()
 
 	// Return the size of your dataset (invoked by the layout manager)
-	override fun getItemCount() = this.recipes.size
+	override fun getItemCount() = this.sortedRecipeFilenameList.size
 
 	// Create new views (invoked by the layout manager)
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeListViewHolder {

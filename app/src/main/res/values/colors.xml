@@ -10,4 +10,5 @@
     <color name="header_text">#D8D8D8</color>
     <color name="label">#D8D8D8</color>
     <color name="value">#D8D8D8</color>
+	<color name="errorLabel">#E2C40C0C</color>
 </resources>

@@ -9,20 +9,32 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.temportalflux.recipebook.R
 import org.json.JSONObject
 
-fun getUserPrefs(ctx: ContextWrapper): SharedPreferences {
+fun getUserPrefs(ctx: Context): SharedPreferences {
 	return ctx.getSharedPreferences(
 		ctx.getString(R.string.preference_file_key),
 		Context.MODE_PRIVATE
 	)
 }
 
-fun getGithubPrivateKey(ctx:ContextWrapper):String?
-{
-	return getUserPrefs(ctx)
-		.getString(ctx.getString(R.string.githubPrivateKey), null)
+fun hasGithubAuth(ctx: Context): Boolean {
+	return getGithubPrivateKeyValue(ctx) != null
 }
 
-fun hasGithubAuth(ctx:ContextWrapper):Boolean { return getGithubPrivateKey(ctx) != null }
+fun getGithubPrivateKeyValue(ctx: Context): String? {
+	return getUserPrefs(ctx)
+		.getString(ctx.getString(R.string.pref_githubPrivateKey), null)
+}
+
+fun getGithubRepositoryValue(ctx: Context): String? {
+	return getUserPrefs(ctx)
+		.getString(ctx.getString(R.string.pref_githubRepository), null)
+}
+
+fun getGithubBranchValue(ctx:Context): String?
+{
+	return getUserPrefs(ctx)
+		.getString(ctx.getString(R.string.pref_githubBranch), null)
+}
 
 class JsonHeaderRequest(
 	method: Int, url: String,
@@ -36,11 +48,10 @@ class JsonHeaderRequest(
 }
 
 fun createGithubQuery(
-	ctx: ContextWrapper, query: String,
+	ctx: Context, query: String,
 	listener: Response.Listener<JSONObject>, errorListener: Response.ErrorListener
 ): JsonHeaderRequest? {
-	val privateKey = getGithubPrivateKey(ctx)
-		?: return null
+	val privateKey = getGithubPrivateKeyValue(ctx) ?: return null
 	return JsonHeaderRequest(
 		Request.Method.POST, "https://api.github.com/graphql",
 		mutableMapOf("Authorization" to "bearer $privateKey"),

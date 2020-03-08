@@ -1,28 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/body_background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
 
         <TextView
-            android:id="@+id/password_label"
+            android:id="@+id/label_privateKey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Private Key" />
+            android:labelFor="@id/field_privateKey"
+            android:text="@string/settings.githubAuth.label.privateKey"
+            android:textColor="@color/label"
+            android:textSize="@dimen/label" />
 
         <EditText
-            android:id="@+id/password_input"
+            android:id="@+id/field_privateKey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:autofillHints=""
             android:ems="10"
-            android:inputType="textVisiblePassword|textPassword" />
+            android:inputType="textVisiblePassword|textPassword"
+            android:textColor="@color/value"
+            android:textSize="@dimen/value"
+            tools:text="9fdsa89gas76fsd7asdf" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
+
+        <TextView
+            android:id="@+id/label_repository"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:labelFor="@id/field_repository"
+            android:text="@string/settings.githubAuth.label.repository"
+            android:textColor="@color/label"
+            android:textSize="@dimen/label" />
+
+        <EditText
+            android:id="@+id/field_repository"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:autofillHints=""
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textColor="@color/value"
+            tools:text="garbledeegook" />
 
     </LinearLayout>
 
@@ -30,6 +71,42 @@
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login" />
+        android:text="@string/settings.githubAuth.button.authenticate" />
+
+    <LinearLayout
+        android:id="@+id/row_branch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="5dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="5dp"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/label_branch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:labelFor="@id/field_branch"
+            android:text="@string/settings.githubAuth.label.branches"
+            android:textColor="@color/label"
+            android:textSize="@dimen/label" />
+
+        <Spinner
+            android:id="@+id/field_branch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/label_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/errorLabel"
+        tools:text="Error" />
 
 </LinearLayout>

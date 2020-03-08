@@ -21,7 +21,7 @@
 			android:paddingEnd="0dp"
 			android:text="@string/recipe.new.header"
 			android:textColor="@color/header_text"
-			android:textSize="24sp" />
+			android:textSize="@dimen/header" />
 
 		<Space
 			android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
 			android:paddingEnd="0dp"
 			android:text="@string/recipe.label.new.name"
 			android:textColor="#A2A2A2"
-			android:textSize="14sp" />
+			android:textSize="@dimen/label" />
 
 		<EditText
 			android:id="@+id/field_recipeName"
@@ -68,6 +68,7 @@
 			android:ems="10"
 			android:inputType="textPersonName"
 			android:textColor="#E9E9E9"
+			android:textSize="@dimen/value"
 			tools:text="Name" />
 	</LinearLayout>
 
