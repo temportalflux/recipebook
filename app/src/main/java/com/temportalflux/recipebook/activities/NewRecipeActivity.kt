@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.temportalflux.recipebook.R
-import com.temportalflux.recipebook.Recipe
+import com.temportalflux.recipebook.data.Recipe
 
 class NewRecipeActivity : AppCompatActivity() {
 

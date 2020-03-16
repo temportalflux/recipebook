@@ -1,4 +1,4 @@
-package com.temportalflux.recipebook
+package com.temportalflux.recipebook.data
 
 import android.content.Context
 import android.os.Parcel
@@ -10,6 +10,7 @@ import java.io.File
 import java.io.StringReader
 import java.util.*
 
+/*
 private fun amountStringToNumber(amt: String): Float {
 	// TODO: ?????
 	// 1 - straight int
@@ -17,59 +18,31 @@ private fun amountStringToNumber(amt: String): Float {
 	// 1 1/12 - mixed number
 	return 0.0F
 }
-
-class Ingredient(
-	val amount: String,
-	val unit: String,
-	val type: String,
-	val category: String?
-) : Parcelable {
-
-	constructor(parcel: Parcel) : this(
-		parcel.readString() ?: "",
-		parcel.readString() ?: "",
-		parcel.readString() ?: "",
-		parcel.readString()
-	)
-
-	override fun writeToParcel(parcel: Parcel, flags: Int) {
-		parcel.writeString(this.amount)
-		parcel.writeString(this.unit)
-		parcel.writeString(this.type)
-		parcel.writeString(this.category)
-	}
-
-	override fun describeContents(): Int = 0
-
-	companion object CREATOR : Parcelable.Creator<Ingredient> {
-		override fun createFromParcel(parcel: Parcel): Ingredient {
-			return Ingredient(parcel)
-		}
-
-		override fun newArray(size: Int): Array<Ingredient?> {
-			return arrayOfNulls(size)
-		}
-	}
-
-}
+*/
 
 class Recipe(private var name: String, private var bIsDirty: Boolean = false) : Parcelable {
 
 	private var id: String? = null
 
-	private var source: String = ""
-	private var url: String = ""
+	var source: String = ""
+		private set(value) { field = value }
+	var url: String = ""
+		private set(value) { field = value }
 	private var aliases: List<String> = listOf()
 	private var tags: List<String> = listOf()
 
-	private var activeTime: String = ""
-	private var totalTime: String = ""
-	private var yield: String = ""
+	var activeTime: String = ""
+		private set(value) { field = value }
+	var totalTime: String = ""
+		private set(value) { field = value }
+	var yield: String = ""
+		private set(value) { field = value }
 
-	private var description: String = ""
+	var description: String = ""
+		private set(value) { field = value }
 
-	private var ingredients: List<Ingredient> = listOf()
-	private var instructions: List<String> = listOf()
+	private var ingredients: List<IngredientCategory> = listOf()
+	private var instructions: List<InstructionCategory> = listOf()
 
 	constructor(parcel: Parcel) : this(parcel.readString()!!, false) {
 		this.id = parcel.readString()
@@ -89,12 +62,9 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 		this.yield = parcel.readString() ?: ""
 		this.description = parcel.readString() ?: ""
 
-		this.ingredients = parcel.createTypedArray(Ingredient.CREATOR)?.toList() ?: listOf()
-
-		val instructionList = mutableListOf<String>()
-		parcel.readStringList(instructionList)
-		this.instructions = instructionList
-
+		this.ingredients = parcel.createTypedArray(IngredientCategory.CREATOR)?.toList() ?: listOf()
+		this.instructions =
+			parcel.createTypedArray(InstructionCategory.CREATOR)?.toList() ?: listOf()
 	}
 
 	override fun describeContents(): Int = 0
@@ -111,7 +81,7 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 		dest?.writeString(this.yield)
 		dest?.writeString(this.description)
 		dest?.writeTypedArray(this.ingredients.toTypedArray(), 0)
-		dest?.writeStringList(this.instructions)
+		dest?.writeTypedArray(this.instructions.toTypedArray(), 0)
 	}
 
 	companion object CREATOR : Parcelable.Creator<Recipe> {
@@ -126,6 +96,10 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 
 	fun getName(): String = this.name
 
+	fun getIngredients(): List<IngredientCategory> = this.ingredients
+
+	fun getInstructions(): List<InstructionCategory> = this.instructions
+
 	fun markDirty() {
 		this.bIsDirty = true
 	}
@@ -138,7 +112,9 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 	}
 
 	fun withContent(textFileContent: String): Recipe {
-		deserialize(BufferedReader(StringReader(textFileContent)))
+		BufferedReader(StringReader(textFileContent)).useLines {
+			this.deserialize(it.iterator())
+		}
 		return this
 	}
 
@@ -164,8 +140,8 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 	}
 
 	fun readFromDisk(ctx: Context) {
-		ctx.openFileInput(this.getFileName()).bufferedReader().use {
-			this.deserialize(it)
+		ctx.openFileInput(this.getFileName()).bufferedReader().useLines {
+			this.deserialize(it.iterator())
 		}
 	}
 
@@ -186,24 +162,29 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 
 		// Ingredients
 		writer.write("# ingredients")
-		var category: String? = null
-		for (ingredient in this.ingredients) {
-			if (category != ingredient.category) {
-				category = ingredient.category
-				writer.write("[$category]")
+		for (category in this.ingredients) {
+			if (category.label != null) {
+				writer.write("[${category.label}]")
 				writer.newLine()
 			}
-			writer.write("${ingredient.amount}|${ingredient.unit}|${ingredient.type}")
-			writer.newLine()
+			for (ingredient in category.ingredients) {
+				writer.write("${ingredient.amount}|${ingredient.unit}|${ingredient.type}")
+				writer.newLine()
+			}
 		}
 		writer.newLine()
 
 		// Instructions
-		// TODO: Serialize instruction categories
 		writer.write("# instructions")
-		for (step in this.instructions) {
-			writer.write(step)
-			writer.newLine()
+		for (category in this.instructions) {
+			if (category.label != null) {
+				writer.write("[${category.label}]")
+				writer.newLine()
+			}
+			for (instruction in category.getInstructions()) {
+				writer.write(instruction)
+				writer.newLine()
+			}
 		}
 		writer.newLine()
 
@@ -215,7 +196,7 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 		writer.newLine()
 	}
 
-	private fun deserialize(reader: BufferedReader) {
+	private fun deserialize(reader: Iterator<String>) {
 		this.deserializeHeader(reader)
 
 		this.activeTime = this.deserializeField(reader, "activeTime|") ?: ""
@@ -224,9 +205,26 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 		this.description = this.deserializeField(reader, "description|") ?: ""
 
 		// Skip line between header and body
-		reader.readLine()
+		reader.next()
 
-		val ingredientList = this.deserializeIngredients(reader)
+		val ingredientList = this.deserializeList(
+			reader, "# ingredients",
+			{ line: String?, content: MutableList<Ingredient> ->
+				IngredientCategory(
+					line,
+					content
+				)
+			},
+			{ line: String ->
+				val ingredientEntries = line.split('|')
+				// TODO: Could error if file is improperly formatted (if there are < 3 delimiters)
+				Ingredient(
+					ingredientEntries[0],
+					ingredientEntries[1],
+					ingredientEntries[2]
+				)
+			}
+		)
 		if (ingredientList == null) {
 			Log.e("Recipe", "Failed to fully deserialize recipe, invalid ingredients.")
 			return
@@ -235,8 +233,16 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 
 		// Since `deserializeIngredients` reads the line after the block as well, we can immediately read the instructions
 
-		// TODO: instructions dont handle categories
-		val steps = this.deserializeInstructions(reader)
+		val steps = this.deserializeList(
+			reader, "# instructions",
+			{ line: String?, content: MutableList<String> ->
+				InstructionCategory(
+					line,
+					content
+				)
+			},
+			{ line: String -> line }
+		)
 		if (steps == null) {
 			Log.e("Recipe", "Failed to fully deserialize recipe, invalid instructions.")
 			return
@@ -246,55 +252,56 @@ class Recipe(private var name: String, private var bIsDirty: Boolean = false) : 
 		this.bIsDirty = false
 	}
 
-	private fun deserializeHeader(reader: BufferedReader) {
-		this.name = reader.readLine()
+	private fun deserializeHeader(reader: Iterator<String>) {
+		this.name = reader.next()
 		this.source = this.deserializeField(reader, "source|") ?: ""
 		this.url = this.deserializeField(reader, "url|") ?: ""
 		this.aliases = (this.deserializeField(reader, "aliases|") ?: "").split(',')
 		this.tags = (this.deserializeField(reader, "tags|") ?: "").split(',')
 	}
 
-	private fun deserializeField(reader: BufferedReader, prefix: String): String? {
-		//if (reader.skip(prefix.length.toLong()) != prefix.length.toLong()) return ""
-		return reader.readLine()
+	private fun deserializeField(reader: Iterator<String>, prefix: String): String? {
+		return reader.next().substring(prefix.length)
 	}
 
-	private fun deserializeIngredients(reader: BufferedReader): List<Ingredient>? {
-		val header = reader.readLine()
-		if (header != "# ingredients") return null
+	private fun <TCategory, TItem> deserializeList(
+		reader: Iterator<String>, expectedHeader: String,
+		createCategory: (String?, MutableList<TItem>) -> TCategory,
+		createItem: (String) -> TItem
+	): List<TCategory>? {
+		val header = reader.next()
+		if (header != expectedHeader) return null
 
-		val ingredients: MutableList<Ingredient> = mutableListOf()
-		var ingredientString: String
+		val categories: MutableList<TCategory> = mutableListOf()
+		var contentList: MutableList<TItem> = mutableListOf()
+
+		var line: String?
 		var category: String? = null
 		val categoryRegex = Regex("\\[(.*)]")
 		do {
-			ingredientString = reader.readLine()
-			if (ingredientString.isNotEmpty()) {
-				val categoryMatch = categoryRegex.matchEntire(ingredientString)
+			line = if (reader.hasNext()) reader.next() else null
+			if (line != null && line.isNotEmpty()) {
+
+				val categoryMatch = categoryRegex.matchEntire(line)
 				if (categoryMatch != null) {
+					// save off the previous ingredient category, assuming there are ingredients to save
+					if (contentList.size > 0) {
+						categories.add(createCategory(category, contentList))
+						contentList = mutableListOf()
+					}
 					category = categoryMatch.destructured.component1()
 					continue
 				}
-				val ingredientEntries = ingredientString.split('|')
-				// TODO: Could error if file is improperly formatted (if there are < 3 delimiters)
-				ingredients.add(
-					Ingredient(
-						ingredientEntries[0],
-						ingredientEntries[1],
-						ingredientEntries[2],
-						category
-					)
-				)
+
+				contentList.add(createItem(line))
 			}
-		} while (ingredientString.isNotEmpty())
+		} while (line != null && line.isNotEmpty())
+		// Save off the last remaining category, so long as there are ingredients to save
+		if (contentList.size > 0) {
+			categories.add(createCategory(category, contentList))
+		}
 
-		return ingredients
-	}
-
-	private fun deserializeInstructions(reader: BufferedReader): List<String>? {
-		val header = reader.readLine()
-		if (header != "# instructions") return null
-		return reader.readLines()
+		return categories
 	}
 
 }

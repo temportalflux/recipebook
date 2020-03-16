@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/body_background"
+	android:orientation="vertical">
+
+	<TextView
+		android:id="@+id/RecipeView_Ingredients_Description"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="@color/value" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="0"
+			android:text="Makes"
+			android:textColor="@color/label" />
+
+		<TextView
+			android:id="@+id/RecipeView_Ingredients_Yield"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textColor="@color/value" />
+	</LinearLayout>
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/recipe.label.ingredients"
+		android:textAlignment="center"
+		android:textColor="@color/header_text"
+		android:textSize="@dimen/header" />
+
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/ViewRecipe_IngredientList"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+</LinearLayout>

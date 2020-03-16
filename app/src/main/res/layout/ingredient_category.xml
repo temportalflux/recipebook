@@ -3,13 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/body_background"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/text_name"
+        android:id="@+id/IngredientCategory_Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/label"
-        android:textSize="24sp"
-        tools:text="Recipe Name" />
+        android:textColor="@color/header_text" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/IngredientCategory_IngredientList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

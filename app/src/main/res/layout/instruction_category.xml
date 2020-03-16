@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/body_background"
+	android:orientation="vertical">
+
+	<TextView
+		android:id="@+id/InstructionCategory_Title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="@color/header_text"
+		tools:text="Crust" />
+
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/InstructionCategory_List"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+</LinearLayout>

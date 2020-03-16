@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.temportalflux.recipebook.R
-import com.temportalflux.recipebook.Recipe
+import com.temportalflux.recipebook.data.Recipe
 
 class RecipeListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

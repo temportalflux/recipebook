@@ -24,4 +24,7 @@
 	<string name="settings.githubAuth.label.repository">Repository</string>
 	<string name="settings.githubAuth.button.authenticate">Authenticate</string>
 	<string name="settings.githubAuth.label.branches">Branches</string>
+	<string name="action_edit">Edit</string>
+	<string name="recipe.label.ingredients">Ingredients</string>
+	<string name="placeholder_unknown">Unknown</string>
 </resources>

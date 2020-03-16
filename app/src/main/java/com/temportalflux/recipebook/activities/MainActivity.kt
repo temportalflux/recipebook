@@ -1,6 +1,5 @@
 package com.temportalflux.recipebook.activities
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,27 +10,20 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.temportalflux.recipebook.R
-import com.temportalflux.recipebook.utils.getGithubBranchValue
 import com.temportalflux.recipebook.widgets.RecipeListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
-import com.temportalflux.recipebook.Recipe
-import com.temportalflux.recipebook.utils.createGithubQuery
-import com.temportalflux.recipebook.utils.getGithubRepositoryValue
-import com.temportalflux.recipebook.utils.getUserPrefs
+import com.temportalflux.recipebook.data.Recipe
+import com.temportalflux.recipebook.activities.view_recipe.ViewRecipeActivity
+import com.temportalflux.recipebook.utils.*
 
 // https://codelabs.developers.google.com/codelabs/build-your-first-android-app-kotlin/index.html#7
 // https://www.androidauthority.com/android-app-development-complete-beginners-658469/
 // https://developer.android.com/guide/topics/ui/layout/recyclerview
 // http://www.androidtutorialshub.com/android-recyclerview-tutorial/
-
-interface OnItemGestureListener {
-	fun onItemPress(view: View, position: Int)
-	fun onLongItemPress(view: View, position: Int)
-}
 
 class MainActivity : AppCompatActivity(), OnItemGestureListener {
 
@@ -205,7 +197,10 @@ class MainActivity : AppCompatActivity(), OnItemGestureListener {
 						.getString("text")
 					recipes.add(
 						// these recipes are never dirty, because they always have fresh content from the remote repository
-						Recipe(recipeFileName, false)
+						Recipe(
+							recipeFileName,
+							false
+						)
 							.withId(recipeDatum.getString("oid"))
 							.withContent(recipeContent)
 					)

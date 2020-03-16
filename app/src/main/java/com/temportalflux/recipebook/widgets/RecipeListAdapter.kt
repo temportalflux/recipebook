@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.temportalflux.recipebook.R
-import com.temportalflux.recipebook.Recipe
+import com.temportalflux.recipebook.data.Recipe
 
 class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 
@@ -28,14 +28,14 @@ class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 		return RecipeListViewHolder(itemView)
 	}
 
-	fun getDataAt(position:Int):Recipe?
+	fun getDataAt(position:Int): Recipe?
 	{
 		return this.recipes[this.sortedRecipeFilenameList[position]]
 	}
 
 	// Replace the contents of a view (invoked by the layout manager)
 	override fun onBindViewHolder(holder: RecipeListViewHolder, position: Int) {
-		val recipe:Recipe? = getDataAt(position)
+		val recipe: Recipe? = getDataAt(position)
 		if (recipe != null)
 		{
 			holder.setData(recipe)
@@ -73,7 +73,11 @@ class RecipeListAdapter : RecyclerView.Adapter<RecipeListViewHolder>() {
 		for (recipeFileName in this.sortedRecipeFilenameList) {
 			if (!this.recipes.containsKey(recipeFileName))
 			{
-				this.recipes[recipeFileName] = Recipe(recipeFileName, true)
+				this.recipes[recipeFileName] =
+					Recipe(
+						recipeFileName,
+						true
+					)
 			}
 			val recipe = this.recipes[recipeFileName]
 			if (recipe != null && recipe.isDirty())

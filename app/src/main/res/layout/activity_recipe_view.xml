@@ -1,20 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="@color/body_background"
 	android:orientation="vertical">
 
-	<TextView
-		android:id="@+id/label_recipeName"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/header_background"
-		android:paddingStart="10dp"
-		android:paddingEnd="0dp"
-		android:textColor="@color/header_text"
-		android:textSize="@dimen/header"
-		tools:text="Some Recipe" />
+		android:orientation="horizontal">
+
+		<TextView
+			android:id="@+id/label_recipeName"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingStart="10dp"
+			android:paddingEnd="0dp"
+			android:textColor="@color/header_text"
+			android:textSize="@dimen/header"
+			tools:text="Some Recipe" />
+
+		<Space
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_weight="1" />
+
+		<ImageButton
+			android:id="@+id/btn_edit_recipe"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_weight="0"
+			android:background="#00FFFFFF"
+			android:contentDescription="@string/action_edit"
+			android:minWidth="50dp"
+			app:srcCompat="@drawable/edit_icon" />
+
+	</LinearLayout>
+
+	<androidx.viewpager2.widget.ViewPager2
+		android:id="@+id/recipe_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+		/>
 
 </LinearLayout>

@@ -35,16 +35,12 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".activities.ViewRecipeActivity"
+			android:name=".activities.view_recipe.ViewRecipeActivity"
 			android:label="@string/title_activity_recipe_view"
 			android:theme="@style/AppTheme.NoActionBar" />
 		<activity
 			android:name=".activities.NewRecipeActivity"
 			android:label="@string/title_activity_recipe_new"
-			android:theme="@style/AppTheme.NoActionBar" />
-		<activity
-			android:name=".activities.RecipeListActivity"
-			android:label="@string/title_activity_recipe_list"
 			android:theme="@style/AppTheme.NoActionBar" />
 	</application>
 
